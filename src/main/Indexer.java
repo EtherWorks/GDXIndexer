@@ -44,14 +44,19 @@ public class Indexer {
     private static String getExtensionClass(String extension) {
         switch (extension) {
             case ".mp3":
+            case ".ogg":
+            case ".wav":
                 return "Music";
             case ".png":
             case ".jpg":
                 return "Texture";
             case ".fnt":
+            case ".ttf":
                 return "BitmapFont";
             case ".tmx":
                 return "TiledMap";
+            case ".atlas":
+                return "TextureAtlas";
             default:
                 return "?";
         }
