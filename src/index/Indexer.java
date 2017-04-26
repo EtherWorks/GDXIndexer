@@ -74,10 +74,22 @@ public class Indexer {
 
     public void index(File top, File out) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(out));
-        writer.append("public interface " + getName(out.getName()) + " {");
-        writer.newLine();
         List<Line> list;
         appendFiles(top, list = new LinkedList<>(), top.getName() + "/");
+
+        writer.append("public abstract class " + getName(out.getName()) + " {");
+        writer.newLine();
+        writer.write("\tprivate static Map<String, AssetDescriptor> assetMap;\n" +
+                "\n" +
+                "\tpublic static AssetDescriptor get(String name) {\n" +
+                "\t\treturn getAssetMap().get(name);\n" +
+                "\t}\n" +
+                "\tprivate static Map<String, AssetDescriptor> getAssetMap() {\n" +
+                "\t\tif(assetMap != null)\n" +
+                "\t\t\treturn assetMap;\n" +
+                "\t\telse\n" +
+                "\t\t{\n" +
+                "\t\t\tassetMap = new LinkedHashMap<>();\n");
         for (Line l : list) {
             boolean useExt = false;
             for (Line lin : list) {
@@ -90,8 +102,32 @@ public class Indexer {
                 if (l.getPath().contains(en.getKey()))
                     name = en.getValue() + name;
             }
+            name = name.replaceAll("-", "_");
+            writer.write("\t\t\tassetMap.put(\"" + name.toUpperCase() + "\", " + name.toUpperCase() + ");");
+            writer.newLine();
+        }
+        writer.write(
+                "\t\t\treturn assetMap;\n" +
+                        "\t\t}\n" +
+                        "\t}");
+        writer.newLine();
+
+
+        for (Line l : list) {
+            boolean useExt = false;
+            for (Line lin : list) {
+                if (lin != l && lin.equals(l)) {
+                    useExt = true;
+                }
+            }
+            String name = useExt ? l.getNameWithExtension() : l.getNameWithoutExtension();
+            for (Map.Entry<String, String> en : prefix.entrySet()) {
+                if (l.getPath().contains(en.getKey()))
+                    name = en.getValue() + name;
+            }
+            name = name.replaceAll("-", "_");
             String type = getExtensionClass(l.getExtension());
-            writer.write("\tAssetDescriptor<" + type + "> " + name.toUpperCase() + " = new AssetDescriptor<>(\"" + l.getPath() + l.getFullName() + "\", " + type + ".class);");
+            writer.write("\tpublic static AssetDescriptor<" + type + "> " + name.toUpperCase() + " = new AssetDescriptor<>(\"" + l.getPath() + l.getFullName() + "\", " + type + ".class);");
             writer.newLine();
         }
         writer.append("}");
