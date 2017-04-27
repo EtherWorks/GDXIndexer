@@ -79,17 +79,21 @@ public class Indexer {
 
         writer.append("public abstract class " + getName(out.getName()) + " {");
         writer.newLine();
-        writer.write("\tprivate static Map<String, AssetDescriptor> assetMap;\n" +
+        writer.write("\tprivate static BiMap<String, AssetDescriptor> assetMap;\n" +
                 "\n" +
                 "\tpublic static AssetDescriptor get(String name) {\n" +
                 "\t\treturn getAssetMap().get(name);\n" +
+                "\t}\n" +
+                "\n" +
+                "\tpublic static String getName(AssetDescriptor descriptor) {\n" +
+                "\t\treturn assetMap.inverse().get(descriptor);\n" +
                 "\t}\n" +
                 "\tprivate static Map<String, AssetDescriptor> getAssetMap() {\n" +
                 "\t\tif(assetMap != null)\n" +
                 "\t\t\treturn assetMap;\n" +
                 "\t\telse\n" +
                 "\t\t{\n" +
-                "\t\t\tassetMap = new LinkedHashMap<>();\n");
+                "\t\t\tassetMap = new HashBiMap.create();\n");
         for (Line l : list) {
             boolean useExt = false;
             for (Line lin : list) {
