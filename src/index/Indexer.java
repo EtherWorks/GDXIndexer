@@ -86,9 +86,9 @@ public class Indexer {
                 "\t}\n" +
                 "\n" +
                 "\tpublic static String getName(AssetDescriptor descriptor) {\n" +
-                "\t\treturn assetMap.inverse().get(descriptor);\n" +
+                "\t\treturn getAssetMap().inverse().get(descriptor);\n" +
                 "\t}\n" +
-                "\tprivate static Map<String, AssetDescriptor> getAssetMap() {\n" +
+                "\tprivate static BiMap<String, AssetDescriptor> getAssetMap() {\n" +
                 "\t\tif(assetMap != null)\n" +
                 "\t\t\treturn assetMap;\n" +
                 "\t\telse\n" +
