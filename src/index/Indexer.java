@@ -93,7 +93,7 @@ public class Indexer {
                 "\t\t\treturn assetMap;\n" +
                 "\t\telse\n" +
                 "\t\t{\n" +
-                "\t\t\tassetMap = new HashBiMap.create();\n");
+                "\t\t\tassetMap = HashBiMap.create();\n");
         for (Line l : list) {
             boolean useExt = false;
             for (Line lin : list) {
