@@ -77,21 +77,19 @@ public class Indexer {
         List<Line> list;
         appendFiles(top, list = new LinkedList<>(), top.getName() + "/");
 
-        writer.append("public abstract class " + getName(out.getName()) + " {");
+        writer.append("public class " + getName(out.getName()) + " {");
         writer.newLine();
-        writer.write("\tprivate static BiMap<String, AssetDescriptor> assetMap;\n" +
+        writer.write("\tprivate BiMap<String, Object> assetMap;\n" +
                 "\n" +
-                "\tpublic static AssetDescriptor get(String name) {\n" +
-                "\t\treturn getAssetMap().get(name);\n" +
+                "\tpublic <T> T get(String name) {\n" +
+                "\t\treturn (T) getAssetMap().get(name);\n" +
                 "\t}\n" +
                 "\n" +
-                "\tpublic static String getName(AssetDescriptor descriptor) {\n" +
-                "\t\treturn getAssetMap().inverse().get(descriptor);\n" +
+                "\tpublic String getName(Object obj) {\n" +
+                "\t\treturn getAssetMap().inverse().get(obj);\n" +
                 "\t}\n" +
-                "\tprivate static BiMap<String, AssetDescriptor> getAssetMap() {\n" +
-                "\t\tif(assetMap != null)\n" +
-                "\t\t\treturn assetMap;\n" +
-                "\t\telse\n" +
+                "\tprivate BiMap<String, Object> getAssetMap() {\n" +
+                "\t\tif(assetMap == null)\n" +
                 "\t\t{\n" +
                 "\t\t\tassetMap = HashBiMap.create();\n");
         for (Line l : list) {
@@ -107,13 +105,13 @@ public class Indexer {
                     name = en.getValue() + name;
             }
             name = name.replaceAll("-", "_");
-            writer.write("\t\t\tassetMap.put(\"" + name.toUpperCase() + "\", " + name.toUpperCase() + ");");
+            writer.write("\t\t\tassetMap.put(\"" + name + "\", " + name + ");");
             writer.newLine();
         }
-        writer.write(
-                "\t\t\treturn assetMap;\n" +
-                        "\t\t}\n" +
-                        "\t}");
+        writer.write("\t\t}\n" +
+                "\t\treturn assetMap;\n" +
+                "\t}");
+        writer.newLine();
         writer.newLine();
 
 
@@ -131,7 +129,9 @@ public class Indexer {
             }
             name = name.replaceAll("-", "_");
             String type = getExtensionClass(l.getExtension());
-            writer.write("\tpublic static AssetDescriptor<" + type + "> " + name.toUpperCase() + " = new AssetDescriptor<>(\"" + l.getPath() + l.getFullName() + "\", " + type + ".class);");
+            writer.write("\t@AssignmentAssetManager.Asset(\"" + l.getPath() + l.getFullName() + "\")");
+            writer.newLine();
+            writer.write("\tpublic " + type + " " + name + ";\n");
             writer.newLine();
         }
         writer.append("}");
